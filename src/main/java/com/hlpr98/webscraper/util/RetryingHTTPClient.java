@@ -15,9 +15,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 
-// Was taken from: https://gist.github.com/petrbouda/92647b243eac71b089eb4fb2cfa90bf2
+// Was adopted from: https://gist.github.com/petrbouda/92647b243eac71b089eb4fb2cfa90bf2
 @Slf4j
-public class RetryableHTTPClient<T> {
+public class RetryingHTTPClient<T> {
 
     /**
      * Retry on all exceptions that inherits from IOException:
@@ -58,7 +58,7 @@ public class RetryableHTTPClient<T> {
     private final boolean throwWhenRetryOnResponseExceeded;
     private final Executor delayedExecutor;
 
-    private RetryableHTTPClient(Builder<T> builder) {
+    private RetryingHTTPClient(Builder<T> builder) {
         this.client = builder.client != null ? builder.client : HttpClient.newHttpClient();
         this.handler = builder.bodyHandler;
         this.maxAttempts = builder.maxAttempts != null ? builder.maxAttempts : DEFAULT_MAX_ATTEMPTS;
@@ -156,8 +156,8 @@ public class RetryableHTTPClient<T> {
             return this;
         }
 
-        public RetryableHTTPClient<T> build() {
-            return new RetryableHTTPClient<>(this);
+        public RetryingHTTPClient<T> build() {
+            return new RetryingHTTPClient<>(this);
         }
     }
 

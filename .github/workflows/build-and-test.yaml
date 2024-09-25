@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  Build:
     permissions:
       id-token: write
       contents: read
@@ -27,14 +27,23 @@ jobs:
       - name: Build
         run: mvn --batch-mode -DskipTests package
 
-      - name: Test
+      - name: Test with Coverage
         run: mvn --batch-mode -Dmaven.test.failure.ignore=true test
 
-      - name: Report
+      - name: Test Report
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: Tests run
+          name: Test run results
           path: target/surefire-reports/*.xml
           reporter: java-junit
           fail-on-error: true
+
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+          token: ${{ github.token }}
+          min-coverage-overall: 80
+          title: Code Coverage

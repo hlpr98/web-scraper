@@ -1,6 +1,6 @@
 package com.hlpr98.webscraper;
 
-import com.hlpr98.webscraper.util.RetryableHTTPClient;
+import com.hlpr98.webscraper.util.RetryingHTTPClient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,7 +68,7 @@ public class WebScraperWorkerFactory {
     }
 
     private WebScraperWorker createWorker(HTTPClientConfiguration configuration) {
-        RetryableHTTPClient<String> client = RetryableHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
+        RetryingHTTPClient<String> client = RetryingHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
                 .withMaxAttempts(configuration.getMaxAttempts())
                 .withRetryDelay(configuration.getRetryDelay())
                 .withRetryOnResponse((resp) -> resp.statusCode() >= 500) // handle TOO MANY REQUESTS

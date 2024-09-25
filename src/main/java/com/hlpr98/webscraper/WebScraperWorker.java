@@ -3,7 +3,7 @@ package com.hlpr98.webscraper;
 import com.hlpr98.webscraper.model.domain.WebScrapingResult;
 import com.hlpr98.webscraper.model.net.Response;
 import com.hlpr98.webscraper.parser.IResponseParser;
-import com.hlpr98.webscraper.util.RetryableHTTPClient;
+import com.hlpr98.webscraper.util.RetryingHTTPClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -22,11 +22,11 @@ import java.util.function.Function;
 @Slf4j
 public class WebScraperWorker implements BiConsumer<String, IResponseParser> {
 
-    private final RetryableHTTPClient<String> client;
+    private final RetryingHTTPClient<String> client;
     private final Map<String, IResponseParser<?>> urlVsParser;
     private final Map<String, CompletableFuture<WebScrapingResult>> urlVsParsingTask;
 
-    public WebScraperWorker(RetryableHTTPClient<String> client) {
+    public WebScraperWorker(RetryingHTTPClient<String> client) {
         this.client = client;
         this.urlVsParser = new HashMap<>();
         this.urlVsParsingTask = new HashMap<>();

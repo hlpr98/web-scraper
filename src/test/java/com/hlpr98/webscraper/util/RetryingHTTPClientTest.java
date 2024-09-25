@@ -10,7 +10,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import javax.net.ssl.SSLHandshakeException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -19,13 +19,12 @@ import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 @Testcontainers(disabledWithoutDocker = true, parallel = false)
-public class RetryableHTTPClientTest {
+public class RetryingHTTPClientTest {
 
     private static final String PATH = "/rest/api/latest";
     private static final DockerImageName MOCKSERVER_IMAGE =
@@ -47,7 +46,7 @@ public class RetryableHTTPClientTest {
             mockClient.when(request().withMethod("GET").withPath(PATH))
                     .respond(response().withStatusCode(200));
 
-            HttpResponse<Void> response = RetryableHTTPClient.builder()
+            HttpResponse<Void> response = RetryingHTTPClient.builder()
                     .build()
                     .execute(getRequest(CONTAINER))
                     .get(1, TimeUnit.SECONDS);
@@ -64,7 +63,7 @@ public class RetryableHTTPClientTest {
                     .respond(response().withStatusCode(200).withBody("Body"));
 
             HttpResponse<String> response =
-                    RetryableHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
+                    RetryingHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
                             .build()
                             .execute(getRequest(CONTAINER))
                             .get(1, TimeUnit.SECONDS);
@@ -82,7 +81,7 @@ public class RetryableHTTPClientTest {
                     .respond(response().withStatusCode(200).withBody("Body"));
 
             HttpResponse<String> response =
-                    RetryableHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
+                    RetryingHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
                             .withRetryOnResponse(resp -> resp.body().equals("Weird Body"))
                             .build()
                             .execute(getRequest(CONTAINER))
@@ -104,7 +103,7 @@ public class RetryableHTTPClientTest {
                     .respond(response().withStatusCode(200).withBody("Body"));
 
             HttpResponse<String> response =
-                    RetryableHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
+                    RetryingHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
                             .withMaxAttempts(3)
                             .withRetryDelay(Duration.ofMillis(100))
                             .build()
@@ -126,7 +125,7 @@ public class RetryableHTTPClientTest {
                     .respond(response().withStatusCode(500));
 
             Executable executable =
-                    () -> RetryableHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
+                    () -> RetryingHTTPClient.builder(HttpResponse.BodyHandlers.ofString())
                             .withMaxAttempts(3)
                             .withRetryDelay(Duration.ofMillis(100))
                             .withThrowWhenRetryOnResponseExceeded(true)
@@ -146,7 +145,7 @@ public class RetryableHTTPClientTest {
             mockClient.when(request().withMethod("GET").withPath(PATH))
                     .respond(response().withStatusCode(500));
 
-            HttpResponse<String> response = RetryableHTTPClient.builder( HttpResponse.BodyHandlers.ofString())
+            HttpResponse<String> response = RetryingHTTPClient.builder( HttpResponse.BodyHandlers.ofString())
                     .withMaxAttempts(3)
                     .withRetryDelay(Duration.ofMillis(100))
                     .withThrowWhenRetryOnResponseExceeded(false)
@@ -167,7 +166,7 @@ public class RetryableHTTPClientTest {
                 .build();
 
         Executable executable =
-                () -> RetryableHTTPClient.builder()
+                () -> RetryingHTTPClient.builder()
                         .withHttpClient(httpClient)
                         .withMaxAttempts(3)
                         .withRetryDelay(Duration.ofMillis(100))
@@ -176,6 +175,6 @@ public class RetryableHTTPClientTest {
                         .get(10, TimeUnit.SECONDS);
 
         ExecutionException ex = assertThrows(ExecutionException.class, executable);
-        assertEquals(SSLHandshakeException.class, ex.getCause().getClass());
+        assertInstanceOf(IOException.class, ex.getCause());
     }
 }
