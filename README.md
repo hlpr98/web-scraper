@@ -1,6 +1,6 @@
 # Web Scraper
 
-[![Coverage Status](https://coveralls.io/repos/github/hlpr98/web-scraper/badge.svg)](https://coveralls.io/github/hlpr98/web-scraper)
+[//]: # ([![Coverage Status]&#40;https://coveralls.io/repos/github/hlpr98/web-scraper/badge.svg&#41;]&#40;https://coveralls.io/github/hlpr98/web-scraper&#41;)
 
 This is a Java based web scraper implementation. It is designed with a few functional goals, namely:
 
@@ -34,5 +34,8 @@ The following are the key aspects of the implementation:
 * Hence effectively until the `master` ([WebScraper.java](src/main/java/com/hlpr98/webscraper/WebScraper.java)) doesn't make a `join` call, no processing is done. Only a job graph would be created and kept.
 * Exception or failure in scraping of a particular URL **doesn't lead to failure of entire task**. The `exception` is captured at the URL level and shown at the end as a failure.
 
+## Testing
+* [TestContainer MockServer](https://java.testcontainers.org/modules/mockserver/) is used for mocking the URLs.
+* Tests are configured to run via [Github Actions](https://github.com/hlpr98/web-scraper/actions/workflows/build-and-test.yaml) as well. The report can found under the heading **Test run results**
 
 

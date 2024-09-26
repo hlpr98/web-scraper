@@ -39,5 +39,5 @@ jobs:
           reporter: java-junit
           fail-on-error: true
 
-      - name: Coverage Report
-        run: mvn clean test jacoco:report coveralls:report
+#      - name: Coverage Report
+#        run: mvn clean test jacoco:report coveralls:report
