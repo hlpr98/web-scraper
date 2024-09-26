@@ -1,5 +1,7 @@
 # Web Scraper
 
+[![Coverage Status](https://coveralls.io/repos/github/hlpr98/web-scraper/badge.svg)](https://coveralls.io/github/hlpr98/web-scraper)
+
 This is a Java based web scraper implementation. It is designed with a few functional goals, namely:
 
 * It should handle multiple response formats (ex: JSON, HTML etc.)
